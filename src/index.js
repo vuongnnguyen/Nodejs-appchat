@@ -22,6 +22,10 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Authorization, application/json, Content-Type, Accept");
     next();
 });
+
+app.get('/', (req, res) => {
+    res.json({name: 'vuong'})
+})
 // switch ($_SERVER['HTTP_ORIGIN']) {
 //     case 'http://from.com': case 'https://from.com':
 //     header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
