@@ -28,9 +28,7 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(path.join(__dirname + '/views')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/views/index.html'));
-})
+
 // switch ($_SERVER['HTTP_ORIGIN']) {
 //     case 'http://from.com': case 'https://from.com':
 //     header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
@@ -43,7 +41,12 @@ app.get('/', (req, res) => {
 
 app.use('/uploads', express.static('uploads'));
 app.use("/user", userRoute );
-app.use("/notifi", notifiRoute)
+app.use("/notifi", notifiRoute);
+
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname+ '/views/index.html'));
+})
 
 io.on('connection', socket => {
     let rom="123";
