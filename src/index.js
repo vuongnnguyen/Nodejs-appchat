@@ -13,6 +13,7 @@ const Room= require('./models/room');
 const NickName= require('./models/nickname');
 const Delete= require('./models/deletemsg');
 const path = require('path');
+const PORT = process.env.PORT || 3000;
 
 
 const  mongoose = require('mongoose');
@@ -289,7 +290,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.connection.once('open', ()=>{
-    http.listen( 3000 || process.env.PORT , () => console.log('Server is started'));
+    http.listen( PORT , () => console.log('Server is started'));
 });
 
 
