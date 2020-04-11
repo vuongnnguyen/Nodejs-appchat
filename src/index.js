@@ -12,6 +12,8 @@ const ListMsg= require('./models/listmsg');
 const Room= require('./models/room');
 const NickName= require('./models/nickname');
 const Delete= require('./models/deletemsg');
+const path = require('path');
+
 
 const  mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -24,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(__dirname + '/views'));
-app.use(express.static(path.join(__dirname + '/dist')));
+app.use(express.static(path.join(__dirname + '/views')));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+ '/views/index.html'));
