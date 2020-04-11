@@ -23,8 +23,11 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(express.static(__dirname + '/views'));
+app.use(express.static(path.join(__dirname + '/dist')));
+
 app.get('/', (req, res) => {
-    res.json({name: 'vuong'})
+    res.sendFile(path.join(__dirname+ '/views/index.html'));
 })
 // switch ($_SERVER['HTTP_ORIGIN']) {
 //     case 'http://from.com': case 'https://from.com':
