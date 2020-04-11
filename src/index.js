@@ -271,10 +271,17 @@ io.on('connection', socket => {
 
 
 
-const uri = 'mongodb://localhost/appchat'
+// const uri = 'mongodb://localhost/appchat'
+const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.connection.once('open', ()=>{
     http.listen( 3000 || process.env.PORT , () => console.log('Server is started'));
 });
+
+
+
+
+// mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority
+// 'mongodb+srv://vuongnguyen:nguyenquocvuong@cluster0-rmia4.mongodb.net/DbUserName?retryWrites=true&w=majority';
