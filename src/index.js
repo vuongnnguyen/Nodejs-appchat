@@ -136,14 +136,15 @@ io.on('connection', socket => {
        const abo= { id: nickname1.iduser, name: room.nameaccep, nickname: nickname1.name }
         let obj= {
             _id: message._id,
+            idsend: room._idfd,
             // myid: room._idaccep,
             seen: false,
             msg: message.msg,
             created: message.created,
-            roomname: room.name,
-            idsend: room._idfd,
-            urlImg: room.imgfd,
+            roomname: room.name, 
             name: room.namefriend,
+            urlImg: room.imgfd,
+            
             nickname: nickname2.name,
             room: aroom.name,
             color: aroom.color,

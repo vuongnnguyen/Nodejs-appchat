@@ -197,7 +197,7 @@ class User extends UserModel {
     static async getListMsg(arrMsg, skip, myid) {
   
        
-        const listMsg= await Msg.find( { _id: { $in: arrMsg} }).sort({ created: -1}).skip(skip).limit(10);
+        const listMsg= await Msg.find( { _id: { $in: arrMsg} }, { __v: 0}).sort({ created: -1}).skip(skip).limit(10);
         
         let listRoom= [];
         listMsg.forEach( msg => {
