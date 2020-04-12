@@ -133,7 +133,7 @@ io.on('connection', socket => {
        const aroom= await Room.createRoom(room.name, 'nulls', 'blue', 'aroom', 'nulls');
        const nickname1= await NickName.createdNickName(room._idaccep, 'nulls', room.name);
        const nickname2= await NickName.createdNickName(room._idfd, 'nulls', room.name);
-       const abo= { id: nickname1.iduser, name: room.nameaccep, nickname: nickname1.name }
+       const abo= { id: nickname1.iduser, name: room.nameaccep, nickname: nickname1.name, seen: new Date().getTime()-100  }
         let obj= {
             _id: message._id,
             idsend: room._idfd,
