@@ -12,8 +12,8 @@ const AcceptModel = mongoose.model('accept', AcceptSchema);
 class Accept extends AcceptModel {
 
 
-    static async getListFriendAccept(listaccept, skip) {
-        const accept= await Accept.find( { _id: { $in :  listaccept} }).sort({ created: -1}).skip(skip).limit(10);
+    static async getListFriendAccept(iduser, skip) {
+        const accept= await Accept.find( { idto : iduser }).sort({ created: -1}).skip(skip).limit(10);
         return accept;
     }
 

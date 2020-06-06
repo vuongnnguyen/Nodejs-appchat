@@ -250,8 +250,8 @@ userRoute.post('/getlistuser', (req, res) => {
 
 
 userRoute.post('/getaccept', (req, res) => {
-    const { arrId, skip}= req.body;
-    Accept.getListFriendAccept(arrId, skip)
+    const { iduser, skip} = req.body;
+    Accept.getListFriendAccept(iduser, skip)
     .then(response => {
 
         res.send(response)})
