@@ -18,8 +18,8 @@ notiRoute.get("/", (req, res) => {
 })
 
 notiRoute.post("/getnoti", (req, res) => {
-    const { arrId } = req.body;
-    Notifica.getListNoti(arrId)
+    const { iduser, skip } = req.body;
+    Notifica.getListNoti(iduser, skip)
     .then( response => res.send(response))
     .catch( err => res.status(400).send(err));
 })

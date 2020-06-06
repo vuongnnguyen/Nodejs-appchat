@@ -21,8 +21,8 @@ class Notifica extends NotificaModel {
         return notifica;
     }
 
-    static async getListNoti(listNoti) {
-        const notifica= await Notifica.find( { _id: { $in :  listNoti} }).sort({ created: -1}).limit(10);
+    static async getListNoti(iduser, skip) {
+        const notifica = await Notifica.find( { _idto : iduser}).sort({ created: -1}).skip(skip).limit(10);
         return notifica;
     }
 
