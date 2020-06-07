@@ -20,7 +20,9 @@ const UserSchema = new mongoose.Schema({
 
     hidemsg: { type: Array, default: [], required: true },// an tin nhan o room
     dismissroom: { type: Array, default: [], required: true},// tat thong bao 
-    block: { type: Array, default: [], required: true }
+    block: { type: Array, default: [], required: true },
+    isOffline : Boolean,
+    timeOff : Number
     // deleteroom: { type: Array, default: []}
     
     //default: +(new Date().getTime()) 
@@ -38,6 +40,12 @@ class User extends UserModel {
     //     await User.findOneAndUpdate( { _id: id2}, { $push: { msg: id}});
     //     return 1;
     // }
+
+    static async getStatusUser(iduser) {
+        const auser = await User.findById({_id : iduser});
+        const listStaus = await User.find({_id : { $in: auser.friends } }, { _id: 1, urlImg: 1, name: 1, isOffline: 1, timeOff: 1});
+        return listStaus;
+    }
     
     static async leaveRoom(iduser, idroom) {
         const auser= await User.findOneAndUpdate({_id: iduser}, { $pull: {room: idroom}});
@@ -49,6 +57,7 @@ class User extends UserModel {
     }
 
     static async seachUserInListFriends(seach, listFriends, skip) {
+    //   const auser = await User.findById({_id : iduser});
       const users= await User.find({_id: { $in: listFriends}, $or: [ {name: seach}, {userName: seach} ] }, { _id: 1, name: 1, urlImg: 1, userName: 1}).skip(skip);
       return users;
     }
@@ -165,6 +174,7 @@ class User extends UserModel {
 
 
     static async getMessageinRoom(roomname, skip, iduser) {
+    
         const dlt= await Delete.findOne({idroom: roomname, iduser})
         // const listMsg= await Msg.find( {roomname}).sort({ created: -1}).skip(skip).limit(10);
         console.log('mot');
@@ -318,13 +328,13 @@ class User extends UserModel {
     }
 
     static async signIn(userName, passWord) {
-        const user = await User.findOne({ userName});
+        const user = await User.findOneAndUpdate({ userName}, {isOffline: false, timeOff: Date.now().toString()});
         if(!user) throw new Error("Số điện thoại chưa được đăng kí");
         return user;
     };
 
     static async signUp(userName, passWord, name) {
-        const user = await new User({ userName, passWord, name, created: Date.now().toString() });
+        const user = await new User({ userName, passWord, name, created: Date.now().toString(), isOffline: false, timeOff: Date.now().toString() });
         await user.save()
         .then(async user => {
          await User.findOneAndUpdate( { _id: user._id }, { room: user._id })

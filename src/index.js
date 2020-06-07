@@ -47,9 +47,12 @@ app.use("/notifi", notifiRoute);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+ '/views/index.html'));
-})
+});
+
 
 io.on('connection', socket => {
+
+
     let rom="123";
     console.log('a user connected');
     socket.on("Client-send-room", data =>{
@@ -70,6 +73,8 @@ io.on('connection', socket => {
     socket.on('Connect', data => {
         socket.emit('Reload-dd', 'vv')
     }) 
+
+    
 
     socket.on('Client-send-addFriend',async friend => {
         // socket.broadcast.in(friend._idto).emit('Server-notifiAddFr', );
@@ -200,11 +205,78 @@ io.on('connection', socket => {
     }) 
 
 
-    socket.on('Client-join-room', rooms => {
-        rooms.forEach(room => {
+    socket.on('Client-join-room', data => { 
+        socket.check = false;
+        console.log(data)
+        socket.idd = data.id;
+        data.rooms.forEach(room => {
             socket.join(room)
         });
+        data.rooms.forEach( room => {
+            if(room == socket.idd) return;
+            console.log("emit online");
+            socket.broadcast.in(room).emit('Server-send-online',
+             { urlImg: data.urlImg, isOffline : false ,time : Date.now().toString(), id : data.id});
+        })
     })
+    
+    // dang xuat 
+    socket.on('log-out', data => { // k can gi ca
+    
+            socket.broadcast.in(socket.idd).emit('Server-check-user', false);
+            setTimeout( () => {
+                if(!socket.check) {
+                    //emit offline
+                    User.findById({_id : socket.idd}, { room: 1, urlImg: 1 }).exec()
+                    .then( respone => {
+                        respone.room.forEach( item => {
+                            console.log('off line')
+                            socket.broadcast.in(item).emit('Server-logout', 
+                            { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), id : socket.idd}
+                            )
+                        })
+                    })
+                }
+             }, 10000) 
+    })
+    //
+
+    socket.on('Client-check-user', data => {
+        socket.check = data;
+    })
+
+    // loi thoat
+    socket.on('disconnect', async reson => {
+        socket.broadcast.in(socket.idd).emit('Server-check-user', false);
+        console.log("vao")
+        if(!socket.idd) return;
+            // { isOffline : true ,time : Date.now().toString(), id : socket.idd});
+         setTimeout( () => {
+             console.log(socket.check)
+            if(!socket.check) {
+                //emit offline
+                User.findByIdAndUpdate({_id : socket.idd}, {isOffline: true, timeOff : Date.now().toString()}, { room: 1, urlImg: 1 }).exec()
+                .then( respone => {
+                    respone.room.forEach( item => {
+                        console.log('thoat ung dung')
+                        socket.broadcast.in(item).emit('Server-logout', 
+                        { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), id : socket.idd}
+                        )
+                    })
+                }).catch( err => console.log('loi', err.message))
+            }
+         }, 1000)
+    });
+
+    socket.on('Client-send-leave', data =>{
+        // socket.broadcast.in(data).emit('Client-send-out-room');
+        socket.leave(data);
+    });
+
+
+
+
+
 
     socket.on('Client-send-dismiss-room', data => {
         socket.broadcast.in(data.iduser).emit('Server-send-dismiss-room', data)
@@ -273,20 +345,11 @@ io.on('connection', socket => {
         io.sockets.in(data.iduser).emit('Server-send-leave-room', data);
     });
 
-    socket.on('Client-send-leave', data =>{
-        socket.leave(data);
-    })
-    
-
-
-
-
   });
 
 
-
-// const uri = 'mongodb://localhost/appchat'
-const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
+const uri = 'mongodb://localhost/deappchat'
+//const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });

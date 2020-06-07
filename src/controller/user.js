@@ -43,6 +43,13 @@ userRoute.get('/', (req, res) => {
     .catch(error => res.status(400).send( error.message ))
 });
 
+userRoute.post( '/getStatusUser', (req, res, next) => {
+    const { id } = req.body;
+    User.getStatusUser(id)
+    .then( respone => res.json(respone))
+    .catch( err => console.log(err.message))
+})
+
 userRoute.post('/change-pass',async (req, res) => {
     
     const {authorization}= req.headers;
@@ -309,6 +316,7 @@ userRoute.post("/updateImg", (req, res, next) => {
 
 function middleWare(req, res, next){
     const {authorization}= req.headers;
+    console.log('day la', authorization)
     if(!authorization) next({})
     jwt.verify(authorization, 'chuot', async (err, respone) => {
         if(err) {
