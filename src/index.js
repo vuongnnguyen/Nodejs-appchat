@@ -35,7 +35,7 @@ app.use(session({
 
 
 const  mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
+// mongoose.Promise = global.Promise;
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
@@ -48,16 +48,16 @@ app.use(express.static(__dirname + '/views'));
 app.use(express.static(path.join(__dirname + '/views')));
 
 
-var privateKey = fs.readFileSync('src/ssl/key.pem').toString();
-var certificate = fs.readFileSync('src/ssl/cert.pem').toString();
+// var privateKey = fs.readFileSync('src/ssl/key.pem').toString();
+// var certificate = fs.readFileSync('src/ssl/cert.pem').toString();
 
-var credentials = {key: privateKey, cert: certificate, passphrase: '1234'};
+// var credentials = {key: privateKey, cert: certificate, passphrase: '1234'};
 
 const httpsServer = https.createServer(credentials, app);
-const io = require('socket.io')(httpsServer);
+const io = require('socket.io')(http);
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // passport.use(new FacebookStrategy({
 //     clientID: "699834620842150",
@@ -435,7 +435,7 @@ io.on('connection', socket => {
 
   });
 
-  const httpsServer = https.createServer(credentials, app);
+//   const httpsServer = https.createServer(credentials, app);
 
 // const uri = 'mongodb://localhost/deappchatcham7';
 const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
@@ -443,7 +443,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.connection.once('open', ()=>{
-    httpsServer.listen( PORT , () => console.log('Server is started'));
+    http.listen( PORT , () => console.log('Server is started'));
 });
 
 
