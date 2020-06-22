@@ -59,58 +59,50 @@ const io = require('socket.io')(httpsServer);
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new FacebookStrategy({
-    clientID: "699834620842150",
-    clientSecret: "cd7124b39919056ac5b1229718f6b3a6",
-    callbackURL: "https://localhost:3000/auth/facebook/callback"
-  },
-  async function(accessToken, refreshToken, profile, done) {
-    // User.findOne({ facebookid: profile.id}).lean().exec()
-    // .then( async respone => {
-    //     if(!respone) {
-    //         const user = new User({accessToken, facebookid: profile.id});
-    //         await user.save();
-    //         return done(null, user);
-    //     }
-        
-    //     respone.accessToken = accessToken;
-    await User.findOrCreate(profile.id, profile.displayName)
-    .then( respone => {
-        return done(null, { accessToken, refreshToken, profile, user : respone })
-    })
-    .catch(err => done(err.message)); 
-  }
-));
+// passport.use(new FacebookStrategy({
+//     clientID: "699834620842150",
+//     clientSecret: "cd7124b39919056ac5b1229718f6b3a6",
+//     callbackURL: "https://localhost:3000/auth/facebook/callback"
+//   },
+//   async function(accessToken, refreshToken, profile, done) {
 
-passport.serializeUser(function(user, done) {
-    console.log("chay seria")
-    // ghi vao sesssion
-    done(null, user);
-});
+//     await User.findOrCreate(profile.id, profile.displayName)
+//     .then( respone => {
+//         return done(null, { accessToken, refreshToken, profile, user : respone })
+//     })
+//     .catch(err => done(err.message)); 
+//   }
+// ));
 
-passport.deserializeUser(function(data, done) {
-    console.log("chay desia")
-     User.findOne({  idFb: data.user.idFb  }, (err, user) => {
-        //  console.log(req)
-        // console.log(session)
-        console.log(err, user)
-        if(!user) return done(null, false);
-        done(err, data.user);
-       });
-  });
+// passport.serializeUser(function(user, done) {
+//     console.log("chay seria")
+//     // ghi vao sesssion
+//     done(null, user);
+// });
+
+// passport.deserializeUser(function(data, done) {
+//     console.log("chay desia")
+//      User.findOne({  idFb: data.user.idFb  }, (err, user) => {
+//         //  console.log(req)
+//         // console.log(session)
+//         console.log(err, user)
+//         if(!user) return done(null, false);
+//         done(err, data.user);
+//        });
+//   });
 
 
 
-app.get('/auth/facebook', passport.authenticate('facebook'));
+// app.get('/auth/facebook', passport.authenticate('facebook'));
 
- app.get('/auth/facebook/callback',
-     passport.authenticate('facebook'
-     ), (req, res) => {
-         console.log("ooooooooo")
-        req.session.xx = "dsdsdsds";
-        console.log(req.session.xx)
-        res.redirect('http://localhost:8100/home')
-     });
+//  app.get('/auth/facebook/callback',
+//      passport.authenticate('facebook'
+//      ), (req, res) => {
+//          console.log("ooooooooo")
+//         req.session.xx = "dsdsdsds";
+//         console.log(req.session.xx)
+//         res.redirect('http://localhost:8100/home')
+//      });
 
 // app.get('/auth/facebook/callback',
 //     passport.authenticate('facebook',
@@ -118,31 +110,25 @@ app.get('/auth/facebook', passport.authenticate('facebook'));
 //                                         failureRedirect: '/login' }));
 
 
-app.post('/', (req, res, next) => {
-    console.log('day la');
-    console.log(req.session)
-    res.json('ok');
-})
+// app.post('/', (req, res, next) => {
+//     console.log('day la');
+//     console.log(req.session)
+//     res.json('ok');
+// })
 
 
-app.get('/vuong', (req, res, next) => {
-    if(req.session.xx) {
-        req.session.xx++;
-    }
-    if(!req.session.xx) {
-        console.log("da vao bien nay");
-        req.session.xx = 0;
-    }
-    res.json(req.session.xx)
-})
+// app.get('/vuong', (req, res, next) => {
+//     if(req.session.xx) {
+//         req.session.xx++;
+//     }
+//     if(!req.session.xx) {
+//         console.log("da vao bien nay");
+//         req.session.xx = 0;
+//     }
+//     res.json(req.session.xx)
+// })
 
-app.get('/',(req, res, next) => {
-    console.log("deseria");
-    console.log(req.isAuthenticated());
-    console.log("sd")
-    console.log(req.session);
-    next();
-}, (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+ '/views/index.html'));
 });
 
