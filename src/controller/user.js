@@ -43,6 +43,20 @@ userRoute.get('/', (req, res) => {
     .catch(error => res.status(400).send( error.message ))
 });
 
+
+userRoute.get('/verify/:id/:code', async (req, res) => {
+    const { id, code } = req.params;
+    await User.findOneAndUpdate({_id: id, codeSignUp: code}, { active : true}).exec()
+    .then( respone => {
+        if(!respone) {
+            res.json("Xác thực của bạn đã sai");
+            return; 
+        }
+        res.json("Đã xác thực thành công")
+    })
+    .catch( err => res.json("Lỗi"))
+})
+
 userRoute.post( '/getStatusUser', (req, res, next) => {
     const { id } = req.body;
     User.getStatusUser(id)
@@ -348,7 +362,16 @@ userRoute.post('/get-user', async (req, res) => {
     })
 })
 
-userRoute.post('/middle-ware', (req, res) => {
+userRoute.get('/middle-ware', (req, res) => {
+    // console.log(req.isAuthenticated());
+    // console.log(req.session.xx)
+    // console.log("check ne")
+    // if(req.isAuthenticated()) {
+    //     console.log("vao day ok")
+    //     console.log(req.session);
+    //     res.send({ stt: true, user: req.session.passport.user.user});
+    //     return;
+    // };
     const {authorization}= req.headers;
     if(!authorization) {
         console.log('da vao saiiiii');
@@ -360,7 +383,7 @@ userRoute.post('/middle-ware', (req, res) => {
         if(err) {
             console.log('loi'+ err.message);
             res.send({stt: false, user: {}});
-            return;
+            return; 
         }
       
         const auser= await User.findOne({userName: respone.userName, passWord: respone.passWord});
@@ -379,22 +402,23 @@ userRoute.post("/signUp", (req, res) => {
     const { userName, passWord, name } = req.body;
     User.signUp(userName, passWord, name)
     .then( response => res.send(response))
-    .catch( err => res.status(400).send(err));
+    .catch( err => {throw err});
 });
 
 userRoute.post("/signIn", async (req, res) => {  
     const { userName, passWord } = req.body;
     User.signIn( userName, passWord)
     .then( response => {
+        console.log(response)
        const token= jwt.sign({ userName, passWord }, 'chuot')
-        res.send({user: response, token})
+        res.send({user: response.user, token, data: response.data, status: response.status})
 
         
     })
     .catch( err =>{ 
         console.log(err.message)
-        res.status(400).send(err)
-    });
+       throw err;
+    }); 
 });
 
 module.exports = userRoute;

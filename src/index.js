@@ -1,7 +1,7 @@
 const app = require('express')();
 const express= require('express');
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+// const io = require('socket.io')(http);
 const userRoute = require('./controller/user');
 const notifiRoute= require('./controller/notification')
 const morgan = require('morgan');
@@ -14,6 +14,24 @@ const NickName= require('./models/nickname');
 const Delete= require('./models/deletemsg');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
+
+const https = require("https");
+const fs = require('fs');
+const session = require('express-session');
+const  passport = require('passport')
+, FacebookStrategy = require('passport-facebook').Strategy;
+
+app.use(session({ 
+    secret: "chuot",
+    cookie: { secure: false }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
+
 
 
 const  mongoose = require('mongoose');
@@ -30,24 +48,109 @@ app.use(express.static(__dirname + '/views'));
 app.use(express.static(path.join(__dirname + '/views')));
 
 
-// switch ($_SERVER['HTTP_ORIGIN']) {
-//     case 'http://from.com': case 'https://from.com':
-//     header('Access-Control-Allow-Origin: '.$_SERVER['HTTP_ORIGIN']);
-//     header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-//     header('Access-Control-Max-Age: 1000');
-//     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-//     break;
-// }
-// app.use(morgan('dev'));
+var privateKey = fs.readFileSync('src/ssl/key.pem').toString();
+var certificate = fs.readFileSync('src/ssl/cert.pem').toString();
+
+var credentials = {key: privateKey, cert: certificate, passphrase: '1234'};
+
+const httpsServer = https.createServer(credentials, app);
+const io = require('socket.io')(httpsServer);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new FacebookStrategy({
+    clientID: "699834620842150",
+    clientSecret: "cd7124b39919056ac5b1229718f6b3a6",
+    callbackURL: "https://localhost:3000/auth/facebook/callback"
+  },
+  async function(accessToken, refreshToken, profile, done) {
+    // User.findOne({ facebookid: profile.id}).lean().exec()
+    // .then( async respone => {
+    //     if(!respone) {
+    //         const user = new User({accessToken, facebookid: profile.id});
+    //         await user.save();
+    //         return done(null, user);
+    //     }
+        
+    //     respone.accessToken = accessToken;
+    await User.findOrCreate(profile.id, profile.displayName)
+    .then( respone => {
+        return done(null, { accessToken, refreshToken, profile, user : respone })
+    })
+    .catch(err => done(err.message)); 
+  }
+));
+
+passport.serializeUser(function(user, done) {
+    console.log("chay seria")
+    // ghi vao sesssion
+    done(null, user);
+});
+
+passport.deserializeUser(function(data, done) {
+    console.log("chay desia")
+     User.findOne({  idFb: data.user.idFb  }, (err, user) => {
+        //  console.log(req)
+        // console.log(session)
+        console.log(err, user)
+        if(!user) return done(null, false);
+        done(err, data.user);
+       });
+  });
+
+
+
+app.get('/auth/facebook', passport.authenticate('facebook'));
+
+ app.get('/auth/facebook/callback',
+     passport.authenticate('facebook'
+     ), (req, res) => {
+         console.log("ooooooooo")
+        req.session.xx = "dsdsdsds";
+        console.log(req.session.xx)
+        res.redirect('http://localhost:8100/home')
+     });
+
+// app.get('/auth/facebook/callback',
+//     passport.authenticate('facebook',
+//      { successRedirect: 'http://localhost:8100/home',
+//                                         failureRedirect: '/login' }));
+
+
+app.post('/', (req, res, next) => {
+    console.log('day la');
+    console.log(req.session)
+    res.json('ok');
+})
+
+
+app.get('/vuong', (req, res, next) => {
+    if(req.session.xx) {
+        req.session.xx++;
+    }
+    if(!req.session.xx) {
+        console.log("da vao bien nay");
+        req.session.xx = 0;
+    }
+    res.json(req.session.xx)
+})
+
+app.get('/',(req, res, next) => {
+    console.log("deseria");
+    console.log(req.isAuthenticated());
+    console.log("sd")
+    console.log(req.session);
+    next();
+}, (req, res) => {
+    res.sendFile(path.join(__dirname+ '/views/index.html'));
+});
+
+
 
 app.use('/uploads', express.static('uploads'));
 app.use("/user", userRoute );
 app.use("/notifi", notifiRoute);
-
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname+ '/views/index.html'));
-});
 
 
 io.on('connection', socket => {
@@ -216,7 +319,7 @@ io.on('connection', socket => {
             if(room == socket.idd) return;
             console.log("emit online");
             socket.broadcast.in(room).emit('Server-send-online',
-             { urlImg: data.urlImg, isOffline : false ,time : Date.now().toString(), id : data.id});
+             { urlImg: data.urlImg, isOffline : false ,time : Date.now().toString(), _id : data.id});
         })
     })
     
@@ -232,7 +335,7 @@ io.on('connection', socket => {
                         respone.room.forEach( item => {
                             console.log('off line')
                             socket.broadcast.in(item).emit('Server-logout', 
-                            { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), id : socket.idd}
+                            { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), _id : socket.idd}
                             )
                         })
                     })
@@ -260,7 +363,7 @@ io.on('connection', socket => {
                     respone.room.forEach( item => {
                         console.log('thoat ung dung')
                         socket.broadcast.in(item).emit('Server-logout', 
-                        { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), id : socket.idd}
+                        { urlImg: respone.urlImg, isOffline : true ,time : Date.now().toString(), _id : socket.idd}
                         )
                     })
                 }).catch( err => console.log('loi', err.message))
@@ -272,11 +375,6 @@ io.on('connection', socket => {
         // socket.broadcast.in(data).emit('Client-send-out-room');
         socket.leave(data);
     });
-
-
-
-
-
 
     socket.on('Client-send-dismiss-room', data => {
         socket.broadcast.in(data.iduser).emit('Server-send-dismiss-room', data)
@@ -345,16 +443,21 @@ io.on('connection', socket => {
         io.sockets.in(data.iduser).emit('Server-send-leave-room', data);
     });
 
+    socket.on("tangdiem", data => {
+        console.log("day la idem", data);
+    })
+
   });
 
+//   const httpsServer = https.createServer(credentials, app);
 
-// const uri = 'mongodb://localhost/deappchat'
-const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
+const uri = 'mongodb://localhost/deappchatcham7';
+//\const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.connection.once('open', ()=>{
-    http.listen( PORT , () => console.log('Server is started'));
+    app.listen( PORT , () => console.log('Server is started'));
 });
 
 

@@ -4,14 +4,17 @@ const Msg= require('./listmsg');
 const Room= require('./room');
 const NickName= require('./nickname');
 const Delete= require('./deletemsg');
+const nodemailer = require('../mailer/index');
+const ramdomstring = require('randomstring');
+
 const UserSchema = new mongoose.Schema({ 
     name: { type: String},
-    userName: { type: String, required: true, trim: true}, 
-    passWord: { type: String, required: true, trim: true},
+    userName: { type: String, trim: true}, 
+    passWord: { type: String, trim: true},
     friends: { type: Array, default: [],  required: true},
-    active: { type: Boolean, default: true,  required: true},
+    active: { type: Boolean, default: false,  required: true},
     room: { type: Array, default: [],  required: true},
-    urlImg: { type: String, default: 'https://vuongdeptrai.herokuapp.com/uploads/1581676532371.jpeg',  required: true },
+    urlImg: { type: String, default: 'https://vuongdeptrai.herokuapp.com/uploads/1581676532371.jpeg' },
     created: { type: Number,  required: true},
     notification: { type: Array, default: [],  required: true },
     waitaccept: { type: Array, default: [], required: true }, // loi moi ket ban da goi
@@ -22,7 +25,9 @@ const UserSchema = new mongoose.Schema({
     dismissroom: { type: Array, default: [], required: true},// tat thong bao 
     block: { type: Array, default: [], required: true },
     isOffline : Boolean,
-    timeOff : Number
+    timeOff : Number,
+    idFb : String,
+    codeSignUp : String
     // deleteroom: { type: Array, default: []}
     
     //default: +(new Date().getTime()) 
@@ -40,6 +45,23 @@ class User extends UserModel {
     //     await User.findOneAndUpdate( { _id: id2}, { $push: { msg: id}});
     //     return 1;
     // }
+
+
+    static async findOrCreate(idFb, name) {
+       const respone = await User.findOne({idFb});
+       if(!respone) {
+           console.log(respone);
+           console.log("respone")
+        const auser = await new User({idFb, name, created: Date.now().toString(), isOffline: false, timeOff: Date.now().toString()});
+        await auser.save()
+        .then(async user => {
+            await User.findOneAndUpdate( { _id: user._id }, { room: user._id })
+        });
+
+       }
+       const userss = await User.findOne({idFb});
+       return userss;
+    }
 
     static async getStatusUser(iduser) {
         const auser = await User.findById({_id : iduser});
@@ -328,16 +350,22 @@ class User extends UserModel {
     }
 
     static async signIn(userName, passWord) {
-        const user = await User.findOneAndUpdate({ userName}, {isOffline: false, timeOff: Date.now().toString()});
-        if(!user) throw new Error("Số điện thoại chưa được đăng kí");
-        return user;
+        const user = await User.findOneAndUpdate({ userName}, {isOffline: false, timeOff: Date.now().toString()})
+        if(!user) return { status : 400, data : 'Email chưa được đăng ký'};
+        if(!user.active) return { status : 400, data : 'Email chưa được xác thực'};
+        if(user.passWord != passWord) return { status : 400, data : 'Sai mật khẩu'};
+        return { status : 200, user, data: '' };
     };
 
     static async signUp(userName, passWord, name) {
+        const code = await ramdomstring.generate();
+        const auserr = await User.findOne({userName});
+        if(auserr) return { status: 400, data : 'Taì khoản đã được đăng ký'} 
+
         const user = await new User({ userName, passWord, name, created: Date.now().toString(), isOffline: false, timeOff: Date.now().toString() });
         await user.save()
         .then(async user => {
-         await User.findOneAndUpdate( { _id: user._id }, { room: user._id })
+         await User.findOneAndUpdate( { _id: user._id }, { room: user._id, codeSignUp : code });
         //  .then( auser => {
         //      console.log('line 28' +auser)
         //  })
@@ -348,8 +376,9 @@ class User extends UserModel {
             // console.log( auser)
             // return auser;
             
-        })
-        return true;
+        });
+        await nodemailer.sendVerifyEmail(name, userName, `https://localhost:3000/user/verify/${user._id}/${code}`);
+        return { status: 200, data: '' };
         
     };
 };
