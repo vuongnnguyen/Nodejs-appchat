@@ -26,8 +26,8 @@ app.use(session({
     cookie: { secure: false }
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 
@@ -435,15 +435,15 @@ io.on('connection', socket => {
 
   });
 
-//   const httpsServer = https.createServer(credentials, app);
+  const httpsServer = https.createServer(credentials, app);
 
-const uri = 'mongodb://localhost/deappchatcham7';
-//\const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
+// const uri = 'mongodb://localhost/deappchatcham7';
+const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.connection.once('open', ()=>{
-    app.listen( PORT , () => console.log('Server is started'));
+    httpsServer.listen( PORT , () => console.log('Server is started'));
 });
 
 
