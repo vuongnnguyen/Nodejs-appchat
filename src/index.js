@@ -53,7 +53,7 @@ app.use(express.static(path.join(__dirname + '/views')));
 
 // var credentials = {key: privateKey, cert: certificate, passphrase: '1234'};
 
-const httpsServer = https.createServer(credentials, app);
+// const httpsServer = https.createServer(credentials, app);
 const io = require('socket.io')(http);
 
 // app.use(passport.initialize());
