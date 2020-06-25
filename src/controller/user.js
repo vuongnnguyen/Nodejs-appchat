@@ -57,14 +57,14 @@ userRoute.get('/verify/:id/:code', async (req, res) => {
     .catch( err => res.json("Lỗi"))
 })
 
-userRoute.post( '/getStatusUser', middleWare(), (req, res, next) => {
+userRoute.post( '/getStatusUser', (req, res, next) => {
     const { id } = req.body;
     User.getStatusUser(id)
     .then( respone => res.json(respone))
     .catch( err => console.log(err.message))
 })
 
-userRoute.post('/change-pass', middleWare(), async (req, res) => {
+userRoute.post('/change-pass',async (req, res) => {
     
     const {authorization}= req.headers;
     const {passOld, passNew}= req.body;
@@ -81,7 +81,7 @@ userRoute.post('/change-pass', middleWare(), async (req, res) => {
     
 })
 
-userRoute.post('/update-user', middleWare(), async (req, res) => {
+userRoute.post('/update-user', async (req, res) => {
     const { id, name, userName}= req.body;
     const auser= await User.findOne({userName, _id: { $nin: id}});
     if(auser) { 
@@ -98,7 +98,7 @@ userRoute.post('/update-user', middleWare(), async (req, res) => {
     
 })
 
-userRoute.post('/add-member', middleWare(), (req, res) => {
+userRoute.post('/add-member', (req, res) => {
     const { idroom, iduser, idadd, usernameadd, username }= req.body;
     NickName.addMember(iduser, idroom, idadd, usernameadd, username)
     .then( async response =>{
@@ -134,7 +134,7 @@ userRoute.post('/add-member', middleWare(), (req, res) => {
          res.status(400).send( error.message )})
 });
 
-userRoute.post('/leave-room', middleWare(), (req, res) => {
+userRoute.post('/leave-room', (req, res) => {
     const { iduser, idroom }= req.body;
     User.leaveRoom(iduser, idroom)
     .then(response => res.send(response))
@@ -144,7 +144,7 @@ userRoute.post('/leave-room', middleWare(), (req, res) => {
     })
 })
 
-userRoute.post('/change-nickname', middleWare(), (req, res) => {
+userRoute.post('/change-nickname', (req, res) => {
     const { iduser, idroom, nickname }= req.body;
     NickName.chaneNickName(iduser, idroom, nickname)
     .then(response => res.send(response))
@@ -154,7 +154,7 @@ userRoute.post('/change-nickname', middleWare(), (req, res) => {
     })
 })
 
-userRoute.post('/seach-member', middleWare(), (req, res) => {
+userRoute.post('/seach-member', (req, res) => {
     const { contentSeach, listFriends, skip }= req.body;
     User.seachUserInListFriends(contentSeach, listFriends, skip)
     .then(response => res.send(response))
@@ -174,7 +174,7 @@ userRoute.post('/create-group', (req, res) => {
 
 });
 
-userRoute.post('/unblock-room', middleWare(), (req, res) => {
+userRoute.post('/unblock-room', (req, res) => {
     const { iduser, idroom }= req.body;
     User.unBlockRoom(iduser, idroom)
     .then(response => res.send(response))
@@ -183,7 +183,7 @@ userRoute.post('/unblock-room', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 });
 
-userRoute.post('/block-room', middleWare(), (req, res) => {
+userRoute.post('/block-room', (req, res) => {
     const { iduser, idroom }= req.body;
     User.blockRoom(iduser, idroom)
     .then(response => res.send(response))
@@ -192,7 +192,7 @@ userRoute.post('/block-room', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 });
 
-userRoute.post('/delete-amsg', middleWare(), (req, res) => {
+userRoute.post('/delete-amsg', (req, res) => {
     const { idroom, iduser, idmsg }= req.body;
     User.deleteMessageinroom(idroom, iduser, idmsg)
     .then(response => res.send(response))
@@ -201,42 +201,42 @@ userRoute.post('/delete-amsg', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 })
 
-userRoute.post('/delete-allmsg', middleWare(), (req, res) => {
+userRoute.post('/delete-allmsg', (req, res) => {
     const { idroom, iduser, time, idmsg }= req.body;
     User.deleteAllMessageinRoom(idroom, iduser, time, idmsg)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 })
 
-userRoute.post('/dismiss-room', middleWare(), (req, res) => {
+userRoute.post('/dismiss-room', (req, res) => {
     const {  iduser, idroom }= req.body;
     User.dismissNortifications(iduser, idroom)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 })
 
-userRoute.post('/miss-room', middleWare(), (req, res) => {
+userRoute.post('/miss-room', (req, res) => {
     const { iduser, idroom }= req.body;
     User.missNotifications(iduser, idroom)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 })
 
-userRoute.post('/show-room', middleWare(), (req, res) => {
+userRoute.post('/show-room', (req, res) => {
     const { iduser, idmsg }= req.body;
     User.showRooms(iduser, idmsg)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 });
 
-userRoute.post('/hide-room', middleWare(), (req, res) => {
+userRoute.post('/hide-room', (req, res) => {
     const { iduser, idmsg }= req.body;
     User.hideRooms(iduser, idmsg)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 });
 
-userRoute.post('/show-room', middleWare(), (req, res) => {
+userRoute.post('/show-room', (req, res) => {
     const { iduser, idmsg }= req.body;
     User.showRooms(iduser, idmsg)
     .then(response => res.send(response))
@@ -244,7 +244,7 @@ userRoute.post('/show-room', middleWare(), (req, res) => {
 })
 
 
-userRoute.post('/get-messagess', middleWare(), (req, res) => {
+userRoute.post('/get-messagess', (req, res) => {
     const { roomname, skip, iduser}= req.body;
     User.getMessageinRoom(roomname, skip, iduser)
     .then(response => res.send(response))
@@ -253,7 +253,7 @@ userRoute.post('/get-messagess', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 })
 
-userRoute.post('/getlistmsg', middleWare(), (req, res) => {
+userRoute.post('/getlistmsg', (req, res) => {
     const { arrMsg, skip, myid}= req.body;
     User.getListMsg(arrMsg, skip, myid)
     .then(response => res.send(response))
@@ -262,7 +262,7 @@ userRoute.post('/getlistmsg', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 })
 
-userRoute.post('/getlistmsg-group', middleWare(), (req, res) => {
+userRoute.post('/getlistmsg-group', (req, res) => {
     const { arrMsg, skip, myid}= req.body;
     User.getListMsgGroup(arrMsg, skip, myid)
     .then(response => res.send(response))
@@ -271,7 +271,7 @@ userRoute.post('/getlistmsg-group', middleWare(), (req, res) => {
         res.status(400).send( error.message )})
 })
 
-userRoute.post('/getlistuser', middleWare(), (req, res) => {
+userRoute.post('/getlistuser', (req, res) => {
     const {listUser}= req.body;
     User.getListUser(listUser)
     .then(response => res.send(response))
@@ -279,7 +279,7 @@ userRoute.post('/getlistuser', middleWare(), (req, res) => {
 })
 
 
-userRoute.post('/getaccept', middleWare(), (req, res) => {
+userRoute.post('/getaccept', (req, res) => {
     const { iduser, skip} = req.body;
     Accept.getListFriendAccept(iduser, skip)
     .then(response => {
@@ -292,7 +292,7 @@ userRoute.post('/getaccept', middleWare(), (req, res) => {
 
 })
 
-userRoute.post("/getuser", middleWare(), (req, res) => {
+userRoute.post("/getuser", (req, res) => {
     const { _id}= req.body;
     User.findUser(_id)
     .then( respone => res.send(respone))
@@ -300,7 +300,7 @@ userRoute.post("/getuser", middleWare(), (req, res) => {
 
 })
 
-userRoute.post("/addRoom", middleWare(), (req, res) => {
+userRoute.post("/addRoom", (req, res) => {
     const { _id, room }= req.body;
     User.addRoomm(_id, room)
     .then( respone => res.send(respone))
@@ -324,7 +324,7 @@ userRoute.post("/vuong", upload.single('file'),(req,res,next)=>{
     res.send({ fileName:   `http://localhost:3000/uploads/${req.file.filename }`  });
 });
 
-userRoute.post("/updateImg", middleWare(), (req, res, next) => {
+userRoute.post("/updateImg", (req, res, next) => {
     const {_id, urlImg } = req.body;
     User.updateImg(_id, urlImg)
     .then( respone => {
@@ -355,14 +355,14 @@ function middleWare(req, res, next){
         
             return;
         }
-        // res.local.user= auser;
+        res.local.user= auser;
         next();
         
     })
 
 }
 
-userRoute.post('/get-user', middleWare(), async (req, res) => {
+userRoute.post('/get-user', async (req, res) => {
     const {authorization}= req.headers;
     if(!authorization) next({})
     jwt.verify(authorization, 'chuot',async (err, respone) => {
