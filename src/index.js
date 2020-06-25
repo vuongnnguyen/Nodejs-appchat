@@ -399,7 +399,8 @@ io.on('connection', socket => {
     })
 
     socket.on('Client-send-createdGroup', data => {
-        socket.broadcast.in(data.idsend).emit('Server-send-createdGroup', data);
+        // socket.broadcast.in(data.idsend).emit('Server-send-createdGroup', data);
+        io.sockets.in(data.idsend).emit('Server-send-createdGroup', data);
     });
 
     socket.on('Client-send-blocked-room', data => {

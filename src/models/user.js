@@ -249,6 +249,29 @@ class User extends UserModel {
         
     }
 
+    static async getListMsgGroup(arrMsg, skip, myid) {
+  
+        const auser= await User.findOne({_id: myid}, { msg: 1})
+         const listMsg= await Msg.find( { _id: { $in: auser.msg} }, { __v: 0}).sort({ created: -1}).skip(skip).limit(10);
+         
+         let listRoom= [];
+         listMsg.forEach( msg => {
+                 listRoom.push(msg.roomname);
+         });
+         const nickname= await NickName.find({ nameroom:{ $in: listRoom } });
+         let listIdUser= [];
+         nickname.forEach( docs => {
+             listIdUser.push(docs.iduser);
+         })
+ 
+         const user= await User.find({ _id: {$in: listIdUser }}, { _id:1, name: 1, urlImg: 1 });
+         const room= await Room.find({ idroom: { $in: listRoom }  });
+  
+         
+         return {  user, listMsg, room, nickname}
+         
+     }
+
     static async findUser(_id) {
         const user= await User.findById({_id});
         return user;
@@ -377,7 +400,7 @@ class User extends UserModel {
             // return auser;
             
         });
-        await nodemailer.sendVerifyEmail(name, userName, `https://localhost:3000/user/verify/${user._id}/${code}`);
+        await nodemailer.sendVerifyEmail(name, userName, `http://vuongdeptrai.herokuapp.com/user/verify/${user._id}/${code}`);
         return { status: 200, data: '' };
         
     };
