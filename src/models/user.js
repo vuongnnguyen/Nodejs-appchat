@@ -78,8 +78,12 @@ class User extends UserModel {
         return true;
     }
 
-    static async seachUserInListFriends(seach, listFriends, skip) {
-    //   const auser = await User.findById({_id : iduser});
+    static async seachUserInListFriends(seach, iduser, skip) {
+      const auser = await User.findById({_id : iduser});
+      let listFriends = [];
+        auser.forEach( item => {
+            listFriends.push(item.friends)
+        })
       const users= await User.find({_id: { $in: listFriends}, $or: [ {name: seach}, {userName: seach} ] }, { _id: 1, name: 1, urlImg: 1, userName: 1}).skip(skip);
       return users;
     }
@@ -353,8 +357,8 @@ class User extends UserModel {
         return users;
     }
 
-    static async findUserName(userName, time) {
-        const users= await User.find( { $and: [ {$or: [ {userName:  userName }, { name: userName}  ]}, {created: { $gt: +time} }  ] }).limit(10);
+    static async findUserName(username, time) {
+        const users= await User.find(  {$or: [ {userName:  username }, { name: username}]}).skip(time).limit(10);
         // const users= await User.find( { name: userName});
         if(users.length==0) throw new Error("Không tìm thấy sdt hoặc tên người dùng");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
         return users;

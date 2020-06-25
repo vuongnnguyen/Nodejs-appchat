@@ -155,8 +155,8 @@ userRoute.post('/change-nickname', (req, res) => {
 })
 
 userRoute.post('/seach-member', (req, res) => {
-    const { contentSeach, listFriends, skip }= req.body;
-    User.seachUserInListFriends(contentSeach, listFriends, skip)
+    const { contentSeach, iduser, skip }= req.body;
+    User.seachUserInListFriends(contentSeach, iduser, skip)
     .then(response => res.send(response))
     .catch(error => res.status(400).send( error.message ))
 })
