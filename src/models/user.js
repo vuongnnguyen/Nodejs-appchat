@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema({
     friends: { type: Array, default: [],  required: true},
     active: { type: Boolean, default: false,  required: true},
     room: { type: Array, default: [],  required: true},
-    urlImg: { type: String, default: 'https://vuongdeptrai.herokuapp.com/uploads/1581676532371.jpeg' },
+    urlImg: { type: String, default: 'http://vuongdeptrai.herokuapp.com/uploads/1581676532371.jpeg' },
     created: { type: Number,  required: true},
     notification: { type: Array, default: [],  required: true },
     waitaccept: { type: Array, default: [], required: true }, // loi moi ket ban da goi

@@ -80,7 +80,7 @@ class NickName extends nickNameModel {
     }
   //  1581685949190.jpeg
     static async createGroup(namegroup, iduser, idroom, username) {
-        const room= await Room.createRoom(idroom, namegroup, 'blue', 'group', 'https://vuongdeptrai.herokuapp.com/uploads/1581685949190.jpeg' );
+        const room= await Room.createRoom(idroom, namegroup, 'blue', 'group', 'http://vuongdeptrai.herokuapp.com/uploads/group-chat.png' );
         console.log(room)
         await NickName.createdNickName(iduser, 'nulls', idroom);
         const msg= await Msg.createAmsg(iduser, false, `${username} da tao nhom`, new Date().getTime(), idroom );

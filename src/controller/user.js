@@ -321,7 +321,7 @@ userRoute.post("/users", (req, res) => {
 
 userRoute.post("/vuong", upload.single('file'),(req,res,next)=>{
     console.log(req.file);
-    res.send({ fileName:   `http://localhost:3000/uploads/${req.file.filename }`  });
+    res.send({ fileName:   `http://vuongdeptrai.herokuapp.com/uploads/${req.file.filename }`  });
 });
 
 userRoute.post("/updateImg", (req, res, next) => {
