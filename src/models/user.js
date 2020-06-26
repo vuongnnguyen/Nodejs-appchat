@@ -79,10 +79,11 @@ class User extends UserModel {
     }
 
     static async seachUserInListFriends(seach, iduser, skip) {
-      const auser = await User.findById({_id : iduser});
+      const auser = await User.findOne({_id : iduser});
       let listFriends = [];
-        auser.forEach( item => {
-            listFriends.push(item.friends)
+    
+        auser.friends.forEach( item => {
+            listFriends.push(item)
         })
       const users= await User.find({_id: { $in: listFriends}, $or: [ {name: seach}, {userName: seach} ] }, { _id: 1, name: 1, urlImg: 1, userName: 1}).skip(skip);
       return users;
