@@ -5,12 +5,6 @@ notiRoute.use(bodyparser.urlencoded({ extended: false}));
 notiRoute.use(bodyparser.json());
 
 
-// notiRoute.get('/', (req, res) => {    
-//     User.find()
-//     .then(response => res.send(response))
-//     .catch(error => res.status(400).send({ message: error.message }))
-// });\\\
-
 notiRoute.get("/", (req, res) => {
     Notifica.find()
     .then(response => res.send(response))

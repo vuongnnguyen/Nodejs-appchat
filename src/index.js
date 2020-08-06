@@ -1,10 +1,8 @@
 const app = require('express')();
 const express= require('express');
 const http = require('http').createServer(app);
-// const io = require('socket.io')(http);
 const userRoute = require('./controller/user');
 const notifiRoute= require('./controller/notification')
-const morgan = require('morgan');
 const User= require('./models/user');
 const Notifica= require('./models/notifica');
 const Accept= require('./models/accept');
@@ -15,27 +13,7 @@ const Delete= require('./models/deletemsg');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 
-const https = require("https");
-const fs = require('fs');
-const session = require('express-session');
-const  passport = require('passport')
-, FacebookStrategy = require('passport-facebook').Strategy;
-
-app.use(session({ 
-    secret: "chuot",
-    cookie: { secure: false }
-}));
-
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-
-
-
-
-
 const  mongoose = require('mongoose');
-// mongoose.Promise = global.Promise;
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
@@ -47,86 +25,7 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname + '/views'));
 app.use(express.static(path.join(__dirname + '/views')));
 
-
-// var privateKey = fs.readFileSync('src/ssl/key.pem').toString();
-// var certificate = fs.readFileSync('src/ssl/cert.pem').toString();
-
-// var credentials = {key: privateKey, cert: certificate, passphrase: '1234'};
-
-// const httpsServer = https.createServer(credentials, app);
 const io = require('socket.io')(http);
-
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-// passport.use(new FacebookStrategy({
-//     clientID: "699834620842150",
-//     clientSecret: "cd7124b39919056ac5b1229718f6b3a6",
-//     callbackURL: "https://localhost:3000/auth/facebook/callback"
-//   },
-//   async function(accessToken, refreshToken, profile, done) {
-
-//     await User.findOrCreate(profile.id, profile.displayName)
-//     .then( respone => {
-//         return done(null, { accessToken, refreshToken, profile, user : respone })
-//     })
-//     .catch(err => done(err.message)); 
-//   }
-// ));
-
-// passport.serializeUser(function(user, done) {
-//     console.log("chay seria")
-//     // ghi vao sesssion
-//     done(null, user);
-// });
-
-// passport.deserializeUser(function(data, done) {
-//     console.log("chay desia")
-//      User.findOne({  idFb: data.user.idFb  }, (err, user) => {
-//         //  console.log(req)
-//         // console.log(session)
-//         console.log(err, user)
-//         if(!user) return done(null, false);
-//         done(err, data.user);
-//        });
-//   });
-
-
-
-// app.get('/auth/facebook', passport.authenticate('facebook'));
-
-//  app.get('/auth/facebook/callback',
-//      passport.authenticate('facebook'
-//      ), (req, res) => {
-//          console.log("ooooooooo")
-//         req.session.xx = "dsdsdsds";
-//         console.log(req.session.xx)
-//         res.redirect('http://localhost:8100/home')
-//      });
-
-// app.get('/auth/facebook/callback',
-//     passport.authenticate('facebook',
-//      { successRedirect: 'http://localhost:8100/home',
-//                                         failureRedirect: '/login' }));
-
-
-// app.post('/', (req, res, next) => {
-//     console.log('day la');
-//     console.log(req.session)
-//     res.json('ok');
-// })
-
-
-// app.get('/vuong', (req, res, next) => {
-//     if(req.session.xx) {
-//         req.session.xx++;
-//     }
-//     if(!req.session.xx) {
-//         console.log("da vao bien nay");
-//         req.session.xx = 0;
-//     }
-//     res.json(req.session.xx)
-// })
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname+ '/views/index.html'));
@@ -438,8 +337,7 @@ io.on('connection', socket => {
 
 //   const httpsServer = https.createServer(credentials, app);
 
-// const uri = 'mongodb://localhost/deappchatcham7';
-const uri= 'mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority';
+ const uri = 'mongodb://localhost/deappchatcham7';
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect( uri, { useNewUrlParser: true,  useUnifiedTopology: true });
@@ -448,7 +346,3 @@ mongoose.connection.once('open', ()=>{
 });
 
 
-
-
-// mongodb+srv://appchatmean:JRgwdzNpXn9CV5qo@cluster0-rmia4.mongodb.net/appchat?retryWrites=true&w=majority
-// 'mongodb+srv://vuongnguyen:nguyenquocvuong@cluster0-rmia4.mongodb.net/DbUserName?retryWrites=true&w=majority';

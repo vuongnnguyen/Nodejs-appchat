@@ -64,23 +64,6 @@ userRoute.post( '/getStatusUser', (req, res, next) => {
     .catch( err => console.log(err.message))
 })
 
-userRoute.post('/change-pass',async (req, res) => {
-    
-    const {authorization}= req.headers;
-    const {passOld, passNew}= req.body;
-    const token= jwt.verify(authorization, 'chuot');
-    if(passOld != token.passWord) { throw new Error('mat khau cu khong dung')};
-    User.findOneAndUpdate({userName: token.userName, passWord: passOld}, {passWord: passNew})
-    .then( respone => {
-        const token= jwt.sign({userName: respone.userName, passWord: passNew}, 'chuot');
-        res.send({token: token});
-    })
-    .catch( err =>{ 
-        console.log(err.message);
-        res.status(400).send( err )} )
-    
-})
-
 userRoute.post('/update-user', async (req, res) => {
     const { id, name, userName}= req.body;
     const auser= await User.findOne({userName, _id: { $nin: id}});
@@ -105,15 +88,8 @@ userRoute.post('/add-member', (req, res) => {
         const Users= await NickName.find({nameroom: idroom});
         let arrUser= [];
         Users.forEach(async docs => {
-        //    const auser= await User.findOne({_id: docs.iduser});
-        //    auser.block.findIndex( docs => {
-        //        return docs== idroom;
-        //    });
-        //    if(index != -1) return;
             arrUser.push(docs.iduser);
         });
-
-        // co dc arr cac user roi
 
         arrUser.forEach( async docs => {
             const listmsg= await User.findOne({_id: docs}, { msg: 1});
@@ -127,7 +103,6 @@ userRoute.post('/add-member', (req, res) => {
         
 
          await User.findOneAndUpdate({_id: iduser}, {  $push: { room: idroom }   });
-        // await User.addListmsg(idadd, response.idold, response._id )
         res.send(response)})
     .catch(error =>{
         console.log(error.message)
@@ -371,42 +346,6 @@ userRoute.post('/get-user', async (req, res) => {
     })
 })
 
-userRoute.get('/middle-ware', (req, res) => {
-    // console.log(req.isAuthenticated());
-    // console.log(req.session.xx)
-    // console.log("check ne")
-    // if(req.isAuthenticated()) {
-    //     console.log("vao day ok")
-    //     console.log(req.session);
-    //     res.send({ stt: true, user: req.session.passport.user.user});
-    //     return;
-    // };
-    const {authorization}= req.headers;
-    if(!authorization) {
-        console.log('da vao saiiiii');
-        res.send({stt: false, user: {}});
-        return;
-    }
-    // console.log(req.headers)
-    jwt.verify(authorization, 'chuot', async (err, respone) => {
-        if(err) {
-            console.log('loi'+ err.message);
-            res.send({stt: false, user: {}});
-            return; 
-        }
-      
-        const auser= await User.findOne({userName: respone.userName, passWord: respone.passWord});
-        if(!auser){
-            console.log('da vao sai')
-            res.send({stt: false, user: {}});
-        
-            return;
-        }
-        res.send({stt: true, user: auser});
-        
-    })
-})
-
 userRoute.post("/signUp", (req, res) => {
     const { userName, passWord, name } = req.body;
     User.signUp(userName, passWord, name)
@@ -421,8 +360,6 @@ userRoute.post("/signIn", async (req, res) => {
         console.log(response)
        const token= jwt.sign({ userName, passWord }, 'chuot')
         res.send({user: response.user, token, data: response.data, status: response.status})
-
-        
     })
     .catch( err =>{ 
         console.log(err.message)

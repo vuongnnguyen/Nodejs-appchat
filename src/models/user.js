@@ -26,26 +26,12 @@ const UserSchema = new mongoose.Schema({
     block: { type: Array, default: [], required: true },
     isOffline : Boolean,
     timeOff : Number,
-    idFb : String,
     codeSignUp : String
-    // deleteroom: { type: Array, default: []}
-    
-    //default: +(new Date().getTime()) 
 });
 
 const UserModel = mongoose.model('user', UserSchema);
 
 class User extends UserModel {
-
-    // static async addMsg(id1, id2, id) {
-       // await User.findByIdAndUpdate({ _id: { $in: arrid}}, { $push: { msg: idmsg  }})
-        // await User.findOneAndUpdate({ _id: amsg.idsend }, { $push: { msg: amsg._id }});
-        // await User.findOneAndUpdate({ _id: amsg.idto }, { $push: { msg: amsg._id }})
-    //     await User.findOneAndUpdate( { _id: id1}, { $push: { msg: id} });
-    //     await User.findOneAndUpdate( { _id: id2}, { $push: { msg: id}});
-    //     return 1;
-    // }
-
 
     static async findOrCreate(idFb, name) {
        const respone = await User.findOne({idFb});
@@ -297,9 +283,6 @@ class User extends UserModel {
         
         if(!accept) throw new Error('loi1');
          await this.deleteFriendAccept(room._idaccep, accept._id)
-    // const _idaccep= room._idaccep;
-    //    const user= await User.findOne({ $and: [  {_id: room._idfd}, { _idaccep : {  $in: waitaccept } }     ]})
-        // const accept= await Accept.findAccept(room._idfd, room._idaccep);
         const user= await User.findOne({_id: room._idfd});
 
         const index= user.waitaccept.findIndex( wait => {
@@ -394,16 +377,6 @@ class User extends UserModel {
         await user.save()
         .then(async user => {
          await User.findOneAndUpdate( { _id: user._id }, { room: user._id, codeSignUp : code });
-        //  .then( auser => {
-        //      console.log('line 28' +auser)
-        //  })
-        //  .catch( err => {
-        //      console.log(err)
-        //  })
-            // .then(user)
-            // console.log( auser)
-            // return auser;
-            
         });
         await nodemailer.sendVerifyEmail(name, userName, `http://vuongdeptrai.herokuapp.com/user/verify/${user._id}/${code}`);
         return { status: 200, data: '' };

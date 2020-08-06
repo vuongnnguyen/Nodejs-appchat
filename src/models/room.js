@@ -8,8 +8,6 @@ const roomSchema = new mongoose.Schema({
     created: { type: Number},
     urlImg: { type: String},
     countBlock: { type: Number, default: 0}
-    
-    //default: +(new Date().getTime()) 
 });
 
 const roomModel = mongoose.model('room', roomSchema);

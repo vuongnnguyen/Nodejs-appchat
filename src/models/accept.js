@@ -3,8 +3,6 @@ const AcceptSchema = new mongoose.Schema({
     idsend: { type: String},
     idto: { type: String},
     created: { type: Number}
-    
-    //default: +(new Date().getTime()) 
 });
 
 const AcceptModel = mongoose.model('accept', AcceptSchema);

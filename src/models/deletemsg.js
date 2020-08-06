@@ -6,8 +6,6 @@ const deleteSchema = new mongoose.Schema({
     deletemsg: { type: Array, default: []},
     deleteallmsg: { type: Number, default: + new Date().getTime()},
     created: { type: Number}
-    
-    //default: +(new Date().getTime()) 
 });
 
 const deleteModel = mongoose.model('delete', deleteSchema);
@@ -21,13 +19,11 @@ class Delete extends deleteModel {
     }
 
     static async deleteAmsg(idroom, iduser, idmsg) {
-       // await Delete.findOneAndUpdate({ idroom, iduser}, { $pull: { deletemsg: idmsg} });
         await Delete.findByIdAndUpdate({ idroom, iduser}, { $push: { deletemsg: idmsg} });
         return true;
     }
 
     static async deleteAllmsg(idroom, iduser, time) {
-        //await Delete.findOneAndUpdate({ idroom, iduser}, { $pull: { deletemsg: idmsg} });
         await Delete.findByIdAndUpdate({ idroom, iduser}, { deleteallmsg: +time });
         return true;
     }

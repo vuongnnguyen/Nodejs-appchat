@@ -9,10 +9,6 @@ const nickNameSchema = new mongoose.Schema({
     nameroom: { type: String},
     seen: { type: Number},
     created: { type: Number}
-
-    
-    
-    //default: +(new Date().getTime()) 
 });
 
 const nickNameModel = mongoose.model('nickname', nickNameSchema);
@@ -39,25 +35,6 @@ class NickName extends nickNameModel {
         await NickName.createdNickName(iduser, 'nulls', idroom);
         const msg= await Msg.createAmsg(idadd, false, `${usernameadd} da them ${username} `, new Date().getTime(), idroom );
         const dlt= await Delete.createDelete(idroom, iduser);
-
-        // const Users= await NickName.find({nameroom: idroom});
-        // let arrUser= [];
-        // Users.forEach( docs => {
-        //     arrUser.push(docs._id);
-        // });
-        // // co dc arr cac user roi
-
-        // arrUser.forEach( async docs => {
-        //     const listmsg= await User.findOne({_id: docs}, { msg: 1});
-        //     const msgold= await Msg.findOne({ _id: { $in: listmsg.msg }, roomname: idroom });
-        //     if(!msgold) {
-        //         await User.findOneAndUpdate({_id: docs}, { $push: { msg: msg._id}});
-        //         return;
-        //     }
-        //     await User.addListmsg(docs, msgold._id, msg._id);
-        // })
-
-
         return {
             _id: msg._id,
             seen: msg.seen,
@@ -86,11 +63,6 @@ class NickName extends nickNameModel {
         const msg= await Msg.createAmsg(iduser, false, `${username} da tao nhom`, new Date().getTime(), idroom );
         console.log(msg)
         await Delete.createDelete(idroom, iduser)
-    //    const user= await User.findOneAndUpdate({_id: iduser}, {  $push: { room: idroom, msg: msg._id }   });
-    //    const aauser= await User.findOne({_id: iduser});
-    //    console.log(aauser);
-    //    await User.addRoomm(iduser, idroom);
-    //    await User.addListmsg(iduser, '1', msg._id);
         return {
             _id: msg._id,
             seen: msg.seen,
